@@ -35,3 +35,5 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 /src/assets/firebase-admin.json
+/src/assets/.env
+/src/assets/private.key

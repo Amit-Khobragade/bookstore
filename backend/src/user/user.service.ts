@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { UserFirestoreService } from 'src/firebase/user-firestore/user-firestore.service';
 import { UserSignUpRequest } from './DTO/User.dto';
+import { genSaltSync, hashSync } from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -11,6 +12,11 @@ export class UserService {
     if (user) {
       throw new ConflictException('user already exists');
     }
-    return this.userFirestoreService.createUser(Object.assign({}, userData));
+
+    const salt = genSaltSync();
+    const password = hashSync(userData.password, salt);
+    return this.userFirestoreService.createUser(
+      Object.assign({}, userData, { password }),
+    );
   }
 }

@@ -7,7 +7,20 @@ import { RatingsFirestoreService } from './ratings-firestore/ratings-firestore.s
 import { AuthorFirestoreService } from './author-firestore/author-firestore.service';
 
 @Module({
-  providers: [FirebaseService, UserFirestoreService, OrderFirestoreService, BookFirestoreService, RatingsFirestoreService, AuthorFirestoreService],
-  exports: [UserFirestoreService],
+  providers: [
+    FirebaseService,
+    UserFirestoreService,
+    OrderFirestoreService,
+    BookFirestoreService,
+    RatingsFirestoreService,
+    AuthorFirestoreService,
+  ],
+  exports: [
+    UserFirestoreService,
+    OrderFirestoreService,
+    BookFirestoreService,
+    RatingsFirestoreService,
+    AuthorFirestoreService,
+  ],
 })
 export class FirebaseModule {}

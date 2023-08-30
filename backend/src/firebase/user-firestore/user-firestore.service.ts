@@ -26,7 +26,6 @@ export class UserFirestoreService {
 
   async createUser(user) {
     const doc = await this.firebaseService.getUserCollection().add(user);
-
     return (await doc.get()).data();
   }
 

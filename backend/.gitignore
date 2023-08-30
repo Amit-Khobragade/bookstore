@@ -36,4 +36,4 @@ lerna-debug.log*
 
 /src/assets/firebase-admin.json
 /src/assets/.env
-/src/assets/private.key
+/src/assets/private_key.pem

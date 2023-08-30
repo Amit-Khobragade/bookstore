@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Headers, Post, Put } from '@nestjs/common';
+import { UserSignUpRequest } from './DTO/User.dto';
+import { UserService } from './user.service';
 
 @Controller({ path: 'user', version: '1' })
 export class UserController {
+  constructor(private userService: UserService) {}
+
   @Get()
   getUser(@Headers() headers) {
     console.debug(headers);
@@ -15,9 +19,8 @@ export class UserController {
   }
 
   @Post('sign-up')
-  signup(@Body() body) {
-    console.debug(body);
-    return {};
+  async signup(@Body() body: UserSignUpRequest) {
+    return await this.userService.signUp(body);
   }
 
   @Put()

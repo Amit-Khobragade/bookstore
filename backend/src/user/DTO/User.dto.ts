@@ -19,6 +19,18 @@ export enum UserRoles {
 
 // DTOs
 
+export class UserJwtPayload {
+  id: string;
+  isAuthorized: boolean;
+  role: UserRoles;
+  address: string;
+  phone: string;
+  name: string;
+  email: string;
+  iat: number;
+  exp: number;
+}
+
 export class UserInfoResponseDTO {
   name: string;
   role: UserRoles;
@@ -76,4 +88,32 @@ export class UserSignInRequest {
     message: 'Create a password larger than 8 characters',
   })
   password: string;
+}
+
+export class UserUpdateRequest {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsPhoneNumber()
+  phone: string;
+
+  @IsOptional()
+  @IsEnum(UserRoles)
+  role: UserRoles;
 }

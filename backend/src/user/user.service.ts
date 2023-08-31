@@ -1,7 +1,15 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { UserFirestoreService } from 'src/firebase/user-firestore/user-firestore.service';
-import { UserInfoResponseDTO, UserSignUpRequest } from './DTO/User.dto';
-import { genSaltSync, hashSync } from 'bcryptjs';
+import {
+  UserInfoResponseDTO,
+  UserSignInRequest,
+  UserSignUpRequest,
+} from './DTO/User.dto';
+import { genSaltSync, hashSync, compareSync } from 'bcryptjs';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { sign } from 'jsonwebtoken';
@@ -42,5 +50,22 @@ export class UserService {
     );
   }
 
-  async signIn() {}
+  async signIn(request: UserSignInRequest): Promise<UserInfoResponseDTO> {
+    // Get the user and if doesn't exists throw a 400
+    // Compare the passwords if doesn't match throw a 400
+    const user = await this.userFirestoreService.getUserByEmail(request.email);
+    if (!user || !compareSync(request.password, user.password)) {
+      throw new BadRequestException('Invalid username/password');
+    }
+
+    // return the user
+    delete user.password;
+
+    return new UserInfoResponseDTO(
+      Object.assign(user, {
+        key:
+          'Bearer ' + sign(user, key, { algorithm: 'RS256', expiresIn: '4d' }),
+      }),
+    );
+  }
 }

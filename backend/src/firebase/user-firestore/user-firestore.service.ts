@@ -8,11 +8,9 @@ export class UserFirestoreService {
   async getUserById(id: string) {
     const doc = await this.firebaseService.getUserCollection().doc(id).get();
 
-    if (!doc.exists) {
-      throw new InternalServerErrorException();
+    if (doc.exists) {
+      return Object.assign({}, doc.data(), { id: doc.id });
     }
-
-    return doc.data();
   }
 
   async getUserByEmail(email: string) {
@@ -21,7 +19,11 @@ export class UserFirestoreService {
       .where('email', '==', email)
       .get();
 
-    return doc.docs.at(0)?.data();
+    const user = doc.docs.at(0);
+
+    if (user) {
+      return Object.assign({}, user.data(), { id: user.id });
+    }
   }
 
   async createUser(user) {

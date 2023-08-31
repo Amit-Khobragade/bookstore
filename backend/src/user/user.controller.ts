@@ -1,5 +1,9 @@
 import { Body, Controller, Get, Headers, Post, Put } from '@nestjs/common';
-import { UserInfoResponseDTO, UserSignUpRequest } from './DTO/User.dto';
+import {
+  UserInfoResponseDTO,
+  UserSignInRequest,
+  UserSignUpRequest,
+} from './DTO/User.dto';
 import { UserService } from './user.service';
 
 @Controller({ path: 'user', version: '1' })
@@ -13,9 +17,8 @@ export class UserController {
   }
 
   @Post('sign-in')
-  login(@Body() body) {
-    console.debug(body);
-    return {};
+  login(@Body() body: UserSignInRequest): Promise<UserInfoResponseDTO> {
+    return this.userService.signIn(body);
   }
 
   @Post('sign-up')

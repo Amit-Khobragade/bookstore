@@ -9,10 +9,28 @@ import {
   IsEnum,
 } from 'class-validator';
 
+// ENUM
+
 export enum UserRoles {
   ADMIN = 'ADMIN',
   USER = 'USER',
   SELLER = 'SELLER',
+}
+
+// DTOs
+
+export class UserInfoResponseDTO {
+  name: string;
+  role: UserRoles;
+  isAuthorized: boolean;
+  key: string;
+
+  constructor({ name, role, isAuthorized, key }: Partial<UserInfoResponseDTO>) {
+    this.name = name;
+    this.role = role;
+    this.isAuthorized = isAuthorized;
+    this.key = key;
+  }
 }
 
 export class UserSignUpRequest {
@@ -46,16 +64,16 @@ export class UserSignUpRequest {
   role: UserRoles = UserRoles.USER;
 }
 
-export class UserInfoResponseDTO {
-  name: string;
-  role: UserRoles;
-  isAuthorized: boolean;
-  key: string;
+export class UserSignInRequest {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-  constructor({ name, role, isAuthorized, key }: Partial<UserInfoResponseDTO>) {
-    this.name = name;
-    this.role = role;
-    this.isAuthorized = isAuthorized;
-    this.key = key;
-  }
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/[a-zA-Z0-9@!#%$&]{8,}/, {
+    message: 'Create a password larger than 8 characters',
+  })
+  password: string;
 }

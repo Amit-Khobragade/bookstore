@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Headers, Post, Put } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Put,
+} from '@nestjs/common';
 import {
   UserInfoResponseDTO,
   UserSignInRequest,
   UserSignUpRequest,
+  UserUpdateRequest,
 } from './DTO/User.dto';
 import { UserService } from './user.service';
 
@@ -27,9 +36,15 @@ export class UserController {
   }
 
   @Put()
-  updateUser(@Body() body) {
-    console.debug(body);
-    return {};
+  updateUser(
+    @Body() body: UserUpdateRequest,
+    @Headers('Authorization') authKey: string,
+  ): Promise<UserInfoResponseDTO> {
+    if (!authKey || !authKey.trim()) {
+      throw new BadRequestException('invalid request');
+    }
+
+    return this.userService.updateUser(body, authKey.split(' ')[1]);
   }
 
   @Put('forgot-password')

@@ -24,8 +24,8 @@ export class FirebaseService {
     return db.collection('order');
   }
 
-  public getBookCollection() {
-    return db.collection('book');
+  public getProductCollection() {
+    return db.collection('product');
   }
 
   public getRatingCollection() {
@@ -34,5 +34,9 @@ export class FirebaseService {
 
   public getAuthorCollection() {
     return db.collection('author');
+  }
+
+  public getSellerApplicationCollection() {
+    return db.collection('seller-application');
   }
 }

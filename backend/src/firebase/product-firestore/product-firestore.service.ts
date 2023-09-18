@@ -90,6 +90,7 @@ export class ProductFirestoreService {
 
     if (product) {
       const updates = callback(product);
+      delete updates.pid;
 
       const writeResult = await productCollection.doc(pid).update(updates);
 
@@ -266,9 +267,10 @@ export class ProductFirestoreService {
   async createProduct(product: Product): Promise<string> {
     const productCollection = this.getCollection();
 
-    const createdProductDoc = await productCollection.add(
-      product.toPureJsObject(),
-    );
+    const productObject = product.toPureJsObject();
+    delete productObject.pid;
+
+    const createdProductDoc = await productCollection.add(productObject);
 
     return createdProductDoc.id;
   }

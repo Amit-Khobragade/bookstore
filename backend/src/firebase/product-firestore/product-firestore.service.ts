@@ -59,7 +59,7 @@ export class ProductFirestoreService {
     }
     const readResults = await productCollection
       .limit(PRODUCTS_PER_PAGE)
-      .offset(PAGE * PRODUCTS_PER_PAGE)
+      .offset((PAGE - 1) * PRODUCTS_PER_PAGE)
       .get();
 
     if (readResults.empty) {

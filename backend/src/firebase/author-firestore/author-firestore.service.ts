@@ -1,46 +1,91 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FirebaseService } from '../firebase.service';
+import { Author } from 'src/common/Author';
+
+/* Structure of doc stored in 'author store'
+ * doc_reference_id: author_id // Auto generated
+ * {
+ *    name: string
+ *    photo: url
+ *    about: string // upto 400 characters
+ * }
+ */
 
 @Injectable()
 export class AuthorFirestoreService {
   constructor(private firebaseService: FirebaseService) {}
 
-  async getAuthorById(id: string) {
-    const doc = await this.firebaseService.getAuthorCollection().doc(id).get();
-
-    if (!doc.exists) {
-      throw new NotFoundException();
-    }
-
-    return doc.data();
+  private getCollection() {
+    return this.firebaseService.getAuthorCollection();
   }
 
+  /**
+   * returns author by id
+   */
+  async getAuthorById(id: string): Promise<Author | undefined> {
+    const authorCollection = this.getCollection();
+    const author = await authorCollection.doc(id).get();
+
+    if (author.exists) {
+      return Author.fromObject(author.id, author.data());
+    }
+  }
+
+  /**
+   * searches the author store for `keyword` in the name
+   *
+   * returns array of authors
+   */
   async searchAuthorByName(
     keyword: string,
-    page: number = 1,
-    LIMIT: number = 5,
-  ) {
-    const docs = await this.firebaseService
-      .getAuthorCollection()
-      .where('name', '==', keyword)
-      .offset((page - 1) * LIMIT)
+    PAGE: number = 1,
+    LIMIT: number = 25,
+  ): Promise<Author[]> {
+    const authorCollection = this.getCollection();
+    const authors = await authorCollection
+      .where('name', '>=', keyword)
+      .where('name', '<=', keyword + '\uf8ff')
+      .offset((PAGE - 1) * LIMIT)
       .limit(LIMIT)
       .get();
 
-    return docs.docs.map((doc) => doc.data());
+    if (authors.empty) {
+      return [];
+    }
+
+    return authors.docs.map((doc) => Author.fromObject(doc.id, doc.data()));
   }
 
-  async createAuthor(author) {
-    const doc = await this.firebaseService.getAuthorCollection().add(author);
+  /**
+   * creates author
+   *
+   * returns id of the created doc
+   */
+  async createAuthor(author: Author): Promise<string> {
+    const authorCollection = await this.getCollection();
 
-    return (await doc.get()).data();
+    const authorObject = author.toPureJsObject();
+    delete authorObject.author_id;
+
+    const createdAuthorDoc = await authorCollection.add(author);
+
+    return createdAuthorDoc.id;
   }
 
-  async updateBook(id: string, payload) {
-    const doc = this.firebaseService.getAuthorCollection().doc(id);
+  /**
+   * deletes author
+   *
+   * returns boolean value depending on succesfull deletion
+   */
+  async deleteAuthor(id: string) {
+    const authorCollection = this.getCollection();
+    const authorDoc = authorCollection.doc(id);
 
-    await doc.update(payload);
+    if ((await authorDoc.get()).exists) {
+      const writeResult = await authorDoc.delete();
 
-    return this.getAuthorById(id);
+      return true;
+    }
+    return false;
   }
 }

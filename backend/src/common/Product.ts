@@ -23,6 +23,10 @@ export class Product {
     public language: string,
     public book_length: string,
     public age_restrictions: number,
+    public ratings: {
+      avg_rating: number;
+      number_of_reviews: number;
+    },
     public dimensions: {
       length: number;
       width: number;
@@ -52,6 +56,7 @@ export class Product {
       other.language,
       other.book_length,
       other.age_restrictions,
+      other.ratings,
       other.dimensions,
       other.categories,
       other.other_properties,

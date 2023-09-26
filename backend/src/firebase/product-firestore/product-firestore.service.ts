@@ -28,6 +28,10 @@ import { Genre } from 'src/common/Book';
  *          width: number
  *          height: number
  *      }
+ *      rating: {
+ *          avg_rating: number
+ *          number_of_reviews: number
+ *      }
  *      categories: string[]
  *      other_properties: { string: [string] }
  * }
@@ -198,6 +202,27 @@ export class ProductFirestoreService {
     return this.updateHelper(pid, (product) => ({
       images: [...product.images, ...urls],
     }));
+  }
+
+  /**
+   * adds the rating to the avg rating
+   *
+   * returns boolean value depending on succesfull updation
+   */
+  addRatings(pid: string, ratings: number): Promise<boolean> {
+    return this.updateHelper(
+      pid,
+      ({ ratings: { number_of_reviews, avg_rating } }) => {
+        const newRatings = avg_rating * number_of_reviews + ratings;
+
+        return {
+          ratings: {
+            avg_rating: newRatings / (number_of_reviews + 1),
+            number_of_reviews: number_of_reviews + 1,
+          },
+        };
+      },
+    );
   }
 
   /**

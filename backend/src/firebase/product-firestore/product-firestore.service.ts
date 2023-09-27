@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Product } from 'src/common/Product';
 import { FirebaseService } from '../firebase.service';
 import { Genre } from 'src/common/Book';
+import { Filter } from 'firebase-admin/firestore';
 
 /* Structure of doc stored in 'product store'
  * doc_reference_id: pid // Auto generated
@@ -51,17 +52,16 @@ export class ProductFirestoreService {
   private async queryHelper(
     PAGE: number = 1,
     PRODUCTS_PER_PAGE: number = 25,
-    ...args: [
+    ...queries: [
       string | FirebaseFirestore.FieldPath,
       FirebaseFirestore.WhereFilterOp,
       any,
     ][]
   ): Promise<Product[]> {
     const productCollection = this.getCollection();
-    for (const query of args) {
-      productCollection.where(...query);
-    }
+
     const readResults = await productCollection
+      .where(Filter.and(...queries.map((query) => Filter.where(...query))))
       .limit(PRODUCTS_PER_PAGE)
       .offset((PAGE - 1) * PRODUCTS_PER_PAGE)
       .get();
